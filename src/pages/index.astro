@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import GameArcade from '../components/GameArcade.astro';
 ---
 
 <Layout title="Facelad Hosting">
@@ -20,7 +21,11 @@ import Layout from '../layouts/Layout.astro';
           target="_blank"
           rel="noopener noreferrer">Contáctanos</a>
       </div>
+
+      <a class="hero-cue" href="#arcade">Juega mientras tanto ↓</a>
     </section>
+
+    <GameArcade />
   </main>
 
   <footer>
@@ -73,6 +78,23 @@ import Layout from '../layouts/Layout.astro';
 
   .hero-cta {
     margin-top: 1.75rem;
+  }
+
+  /*
+    Sin una pista visible nadie hace scroll: la portada llena el viewport y
+    el arcade queda entero por debajo del pliegue.
+  */
+  .hero-cue {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: #11103f;
+    text-decoration: none;
+    opacity: 0.65;
+  }
+
+  .hero-cue:hover,
+  .hero-cue:focus-visible {
+    opacity: 1;
   }
 
   footer {
