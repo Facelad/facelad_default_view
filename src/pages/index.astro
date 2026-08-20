@@ -1,23 +1,38 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import GameArcade from '../components/GameArcade.astro';
 ---
 
 <Layout title="Facelad Hosting">
   <main>
-    <a href="https://facelad.com" target="_blank" rel="noopener noreferrer">
-      <img src="/image/facelad.png" alt="facelad logo" />
-    </a>
-    <div>
-      <h1>¡Tu Hosting y/o Dominio está listo!</h1>
-      <p>
-        Esta página se creó automáticamente para verificar la correcta creación
-        y funcionamiento ❤ de tu nueva cuenta de hosting y/o dominio.
-      </p>
-    </div>
+    <section class="hero">
+      <a href="https://facelad.com" target="_blank" rel="noopener noreferrer">
+        <img class="hero-logo" src="/image/facelad.png" alt="facelad logo" />
+      </a>
+      <div class="hero-copy">
+        <h1>¡Tu Hosting y/o Dominio está listo!</h1>
+        <p>
+          Esta página se creó automáticamente para verificar la correcta creación
+          y funcionamiento ❤ de tu nueva cuenta de hosting y/o dominio.
+        </p>
+        <a
+          class="btn btn--mint hero-cta"
+          href="https://facelad.com/contacto/"
+          target="_blank"
+          rel="noopener noreferrer">Contáctanos</a>
+      </div>
+
+      <a class="hero-cue" href="#arcade">Juega mientras tanto ↓</a>
+    </section>
+
+    <GameArcade />
   </main>
 
   <footer>
-    <p>® 2023 Todos los Derechos Reservados</p>
+    <p>® 2026 Todos los Derechos Reservados</p>
+    <p>
+      <a href="https://facelad.com/contacto/" target="_blank" rel="noopener noreferrer">Contacto</a>
+    </p>
     <p>
       Made with <span class="heart">❤</span> by
       <a href="https://facelad.com" target="_blank" rel="noopener noreferrer">facelad</a>
@@ -28,6 +43,11 @@ import Layout from '../layouts/Layout.astro';
 <style>
   main {
     display: flex;
+    flex-direction: column;
+  }
+
+  .hero {
+    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -35,25 +55,46 @@ import Layout from '../layouts/Layout.astro';
     padding: 2rem 1rem;
   }
 
-  img {
+  .hero-logo {
     height: 7rem;
     margin-bottom: 3rem;
   }
 
-  div {
+  .hero-copy {
     max-width: 550px;
     text-align: center;
     padding: 0 1rem;
   }
 
-  h1 {
+  .hero-copy h1 {
     margin-bottom: 1rem;
     font-size: clamp(1.2rem, 5vw, 1.8rem);
   }
 
-  p {
+  .hero-copy p {
     font-size: clamp(0.95rem, 2.5vw, 1.25rem);
     line-height: 1.8rem;
+  }
+
+  .hero-cta {
+    margin-top: 1.75rem;
+  }
+
+  /*
+    Sin una pista visible nadie hace scroll: la portada llena el viewport y
+    el arcade queda entero por debajo del pliegue.
+  */
+  .hero-cue {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: #11103f;
+    text-decoration: none;
+    opacity: 0.65;
+  }
+
+  .hero-cue:hover,
+  .hero-cue:focus-visible {
+    opacity: 1;
   }
 
   footer {
@@ -69,6 +110,7 @@ import Layout from '../layouts/Layout.astro';
 
   footer p {
     font-size: 16px;
+    line-height: 1.8rem;
     margin: 0;
   }
 
@@ -83,7 +125,7 @@ import Layout from '../layouts/Layout.astro';
   }
 
   @media (max-width: 480px) {
-    img {
+    .hero-logo {
       height: 5rem;
       margin-bottom: 2rem;
     }

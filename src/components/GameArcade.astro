@@ -1,0 +1,334 @@
+---
+/**
+ * Arcade con tres mini-juegos en canvas. Todo el markup vive aquí y toda la
+ * lógica en src/scripts/arcade/: los juegos no tienen markup propio, solo
+ * estado, así que un componente por juego solo fragmentaría el grafo de módulos.
+ */
+---
+
+<section class="arcade" id="arcade" data-arcade data-state="idle">
+  <div class="arcade__intro">
+    <h2>¿Un juego mientras tanto?</h2>
+    <p>Tres mini-juegos hechos con HTML, CSS y JavaScript. Sin instalar nada, sin registrarte.</p>
+  </div>
+
+  <div class="arcade__tabs" role="tablist" aria-label="Elige un juego" data-tabs>
+    <button
+      class="arcade__tab"
+      type="button"
+      role="tab"
+      id="arcade-tab-snake"
+      data-game="snake"
+      aria-controls="arcade-panel"
+      aria-selected="true"
+      tabindex="0">Snake</button>
+    <button
+      class="arcade__tab"
+      type="button"
+      role="tab"
+      id="arcade-tab-runner"
+      data-game="runner"
+      aria-controls="arcade-panel"
+      aria-selected="false"
+      tabindex="-1">Corredor</button>
+    <button
+      class="arcade__tab"
+      type="button"
+      role="tab"
+      id="arcade-tab-shooter"
+      data-game="shooter"
+      aria-controls="arcade-panel"
+      aria-selected="false"
+      tabindex="-1">Nave</button>
+  </div>
+
+  <div
+    class="arcade__panel"
+    id="arcade-panel"
+    role="tabpanel"
+    aria-labelledby="arcade-tab-snake"
+    data-panel>
+    <div class="arcade__hud">
+      <span class="arcade__hint" data-hint></span>
+      <!--
+        aria-live="off" a propósito: un marcador que cambia ~20 veces por
+        segundo es ruido para un lector de pantalla. El fin de partida se
+        anuncia una sola vez por la región [data-announce].
+      -->
+      <span class="arcade__score" aria-live="off">
+        Puntos <b data-score>0</b> · Récord <b data-hi>0</b>
+      </span>
+    </div>
+
+    <div class="arcade__stage">
+      <canvas data-canvas width="480" height="320" tabindex="0" aria-label="Área de juego">
+        Tu navegador no soporta canvas. Actualízalo para jugar.
+      </canvas>
+
+      <div class="arcade__overlay" data-overlay="idle">
+        <p>Pulsa Jugar para empezar</p>
+        <button class="btn btn--mint" type="button" data-action="play">Jugar</button>
+      </div>
+
+      <div class="arcade__overlay" data-overlay="paused">
+        <p>En pausa</p>
+        <button class="btn btn--mint" type="button" data-action="resume">Continuar</button>
+      </div>
+
+      <div class="arcade__overlay" data-overlay="gameover">
+        <p>¡Fin del juego!</p>
+        <p class="arcade__final">Puntos: <b data-final-score>0</b></p>
+        <button class="btn btn--mint" type="button" data-action="restart">Reiniciar</button>
+      </div>
+    </div>
+
+    <div class="arcade__controls">
+      <div class="arcade__pad" data-pad hidden>
+        <button class="arcade__key" type="button" data-dir="up" aria-label="Arriba">▲</button>
+        <button class="arcade__key" type="button" data-dir="left" aria-label="Izquierda">◀</button>
+        <button class="arcade__key" type="button" data-dir="down" aria-label="Abajo">▼</button>
+        <button class="arcade__key" type="button" data-dir="right" aria-label="Derecha">▶</button>
+      </div>
+      <button class="btn btn--ghost arcade__pause" type="button" data-action="pause">Pausa</button>
+    </div>
+  </div>
+
+  <p class="visually-hidden" aria-live="polite" data-announce></p>
+</section>
+
+<style>
+  .arcade {
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 3rem 1rem 3.5rem;
+  }
+
+  .arcade__intro {
+    max-width: 34rem;
+    text-align: center;
+  }
+
+  .arcade__intro h2 {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    margin-bottom: 0.6rem;
+  }
+
+  .arcade__intro p {
+    font-size: clamp(0.85rem, 2.2vw, 1rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .arcade__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .arcade__tab {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .arcade__tab[aria-selected='true'] {
+    background: var(--mint);
+    color: var(--navy-deep);
+    border-color: var(--mint);
+    font-weight: bold;
+  }
+
+  .arcade__tab:focus-visible {
+    outline: 3px solid var(--mint);
+    outline-offset: 2px;
+  }
+
+  .arcade__panel {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .arcade__hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .arcade__score {
+    /* Sin tabular-nums el marcador cambia de ancho y sacude la fila entera. */
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .arcade__score b {
+    color: var(--mint);
+  }
+
+  .arcade__stage {
+    position: relative;
+    width: 100%;
+    overscroll-behavior: contain;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    /* aspect-ratio + max-width reservan la caja antes de que corra el JS,
+       de modo que el arcade no provoca desplazamiento de layout (CLS). */
+    aspect-ratio: 3 / 2;
+    border-radius: 12px;
+    border: 1px solid rgba(133, 241, 161, 0.25);
+    box-shadow: 0 10px 30px rgba(17, 16, 63, 0.25);
+    background: var(--navy);
+    /* Solo en el canvas: el resto de la página sigue haciendo scroll normal.
+       De paso desactiva el doble-toque para hacer zoom aquí dentro. */
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    /* Sin esto, un toque largo en iOS abre "Guardar imagen" a media partida. */
+    -webkit-touch-callout: none;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.85rem;
+  }
+
+  canvas:focus-visible {
+    outline: 3px solid var(--mint);
+    outline-offset: 3px;
+  }
+
+  .arcade__overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 12px;
+    background: rgba(24, 23, 64, 0.82);
+    backdrop-filter: blur(2px);
+  }
+
+  .arcade[data-state='idle'] [data-overlay='idle'],
+  .arcade[data-state='paused'] [data-overlay='paused'],
+  .arcade[data-state='gameover'] [data-overlay='gameover'] {
+    display: flex;
+  }
+
+  .arcade__overlay p {
+    font-size: 1rem;
+  }
+
+  .arcade__final {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.9rem;
+  }
+
+  .arcade__final b {
+    color: var(--mint);
+  }
+
+  .arcade__controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .arcade__pad {
+    display: grid;
+    grid-template-columns: repeat(3, 3rem);
+    grid-template-rows: repeat(2, 3rem);
+    gap: 0.35rem;
+  }
+
+  /* Más específico que `.arcade__pad`, así que gana sobre display:grid
+     sin necesidad de !important. */
+  .arcade__pad[hidden] {
+    display: none;
+  }
+
+  .arcade__key {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .arcade__key:active {
+    background: var(--mint);
+    color: var(--navy-deep);
+  }
+
+  .arcade__key[data-dir='up'] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .arcade__key[data-dir='left'] {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .arcade__key[data-dir='down'] {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .arcade__key[data-dir='right'] {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .arcade__pause {
+    margin-left: auto;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* La pausa solo tiene sentido con una partida en curso. */
+  .arcade:not([data-state='playing']):not([data-state='paused']) .arcade__pause {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arcade__tab {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { createArcade } from '../scripts/arcade/engine.js';
+  import snake from '../scripts/arcade/snake.js';
+  import runner from '../scripts/arcade/runner.js';
+  import shooter from '../scripts/arcade/shooter.js';
+
+  // querySelectorAll y no querySelector: Astro deduplica el <script> de un
+  // componente, así que si algún día se renderiza dos veces en la misma
+  // página, este script se ejecuta una sola. Una línea de seguro.
+  document.querySelectorAll('[data-arcade]').forEach((root) => {
+    createArcade({ root, games: [snake, runner, shooter] });
+  });
+</script>
