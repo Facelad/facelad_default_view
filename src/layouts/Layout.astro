@@ -21,10 +21,65 @@ const { title } = Astro.props;
 </html>
 
 <style is:global>
+  :root {
+    /* Navy del logo, usado como fondo del panel del arcade. */
+    --navy: #181740;
+    /* Navy de los enlaces del footer; texto sobre menta. */
+    --navy-deep: #11103f;
+    /* Verde menta del logo: el acento de la marca. */
+    --mint: #85f1a1;
+  }
+
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+
+  /*
+    Botón compartido entre el hero y el arcade. Vive aquí y no en un `<style>`
+    scoped porque Astro aísla los estilos por componente: index.astro y
+    GameArcade.astro tienen distinto data-astro-cid y no podrían compartirlo.
+    Menta sobre navy y navy sobre menta superan AA de contraste.
+  */
+  .btn {
+    display: inline-block;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.7rem 1.4rem;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn--mint {
+    background: var(--mint);
+    color: var(--navy-deep);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid var(--navy-deep);
+    outline-offset: 2px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
