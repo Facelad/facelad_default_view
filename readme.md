@@ -15,7 +15,7 @@ Página de bienvenida que se muestra automáticamente al crear una nueva cuenta 
 ## Estructura del proyecto
 
 ```
-facelad_default_view/
+Facelad-Default-View/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          Build de Astro y publicación en Pages
